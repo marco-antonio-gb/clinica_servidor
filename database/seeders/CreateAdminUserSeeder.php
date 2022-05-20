@@ -14,9 +14,10 @@ class CreateAdminUserSeeder extends Seeder
     public function run()
     {
         $user = Usuario::find(1);
-        $role = Role::create(['name' => 'Administrador','descripcion'=>'Usuario con provilegios globales, con acceso total al sistema de administracion']);
+        $role = Role::create(['name' => 'Administrador','descripcion'=>'Usuario con provilegios globales, acceso total al sistema.']);
         $permissions = Permission::pluck('id','id')->all();
-        $role->syncPermissions($permissions);
-        $user->assignRole([$role->id]);
+        $user->givePermissionTo($permissions);
+        // $role->syncPermissions($permissions);
+        // $user->assignRole([$role->id]);
     }
 }

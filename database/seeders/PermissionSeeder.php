@@ -4,82 +4,55 @@
  */
 namespace Database\Seeders;
 
-use App\Models\Usuario;
 use Illuminate\Database\Seeder;
-use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
 
+class PermissionSeeder extends Seeder {
+	/**
+	 * Run the database seeds.
+	 *
+	 * @return void
+	 */
+	public function run() {
+		$permissions = [
+			'usuario-list',
+			'usuario-create',
+			'usuario-update',
+			'usuario-delete',
+			'usuario-lock',
+			#--------------
+			'rol-list',
+			'rol-create',
+			'rol-update',
+			'rol-delete',
+			#--------------
+			'asignar-rol',
+			'asignar-permiso',
+			#--------------
+			'paciente-create',
+			'paciente-update',
+			'paciente-list',
+			'paciente-delete',
+            #--------------
+			'persona-create',
+			'persona-update',
+			'persona-list',
+			'persona-delete',
+            #--------------
+			'historial-create',
+			'historial-delete',
+			'historial-update',
+			'historial-list',
 
-class PermissionSeeder extends Seeder
-{
-    /**
-     * Run the database seeds.
-     *
-     * @return void
-     */
-    public function run()
-    {
-        $permissions = [
-            'usuario-list',
-            'usuario-create',
-            'usuario-update',
-            'usuario-delete',
-            'usuario-lock',
-            #--------------
-            'empresa-list',
-            'empresa-create',
-            'empresa-update',
-            'empresa-delete',
-            #--------------
-            'contacto-list',
-            'contacto-create',
-            'contacto-update',
-            'contacto-delete',
-            #--------------
-            'evento-list',
-            'evento-create',
-            'evento-update',
-            'evento-delete',
-            "evento-settings",
-            #--------------
-            'participacion-list',
-            'participacion-create',
-            'participacion-update',
-            'participacion-delete',
-            #--------------
-            'layout-list',
-            'layout-create',
-            'layout-update',
-            'layout-delete',
-            #--------------
-            'contrato-list',
-            'contrato-create',
-            'contrato-update',
-            'contrato-delete',
-            #--------------
-            'credencial-list',
-            'credencial-create',
-            'credencial-update',
-            'credencial-delete',
-            #--------------
-            'rol-list',
-            'rol-create',
-            'rol-update',
-            'rol-delete',
-            #--------------
-            'permiso-list',
-            'permiso-create',
-            'permiso-update',
-            'permiso-delete',
-            #--------------
-            'asignar-rol',
-            'asignar-permiso',
-        ];
+			'medico-create',
+			'medico-list',
+			'medico-update',
+			'medico-delete',
+		];
 
-        foreach ($permissions as $permission) {
-            Permission::create(['name' => $permission]);
-        }
+		foreach ($permissions as $permission) {
+			Permission::create(['name' => $permission]);
+		}
 
-
-    }
+	}
 }

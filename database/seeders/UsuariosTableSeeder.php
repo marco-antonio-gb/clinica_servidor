@@ -12,17 +12,17 @@ class UsuariosTableSeeder extends Seeder
     public function run()
     {
         Usuario::create([
-            "paterno"=> "Garcia",
-            "materno"=> "Coca",
-            "nombres"=> "Ana Marianela",
-            "ci"=> "5444217",
-            "ci_ext"=> "OR",
-            "cargo"=> "Administrador de sistemas",
-            "celular"=> "68317456",
-            'password' => bcrypt('admin'),
-            "email"=> "ana@gmail.com",
-            "direccion"=> "Direccion",
-            "settings" =>'{"dark_theme":false}'
+        "email" => "ana@gmail.com",
+        "password" => bcrypt('admin'),
+        "tipo_usuario" => "Administrador",
+        "fecha_ingreso" => "2022-04-15",
+        "fecha_baja" => NULL,
+        "liquidacion" => 0,
+        "profesion" => "Ingeniero de Sistemas",
+        "referencia" => "Ninguna",
+        "estado" =>true,
+        "persona_id" => 1,
+
         ]);
     }
 }

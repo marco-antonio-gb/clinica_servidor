@@ -21,8 +21,8 @@ class AuthController extends Controller {
 	public function login() {
 		$credentials = request(['email', 'password']);
 		if (Usuario::where('email', '=', $credentials['email'])->exists()) {
-			$verificarEstado = Usuario::select('activo')->where('email', '=', $credentials['email'])->get()->first();
-			if ($verificarEstado['activo'] == 0) {
+			$verificarEstado = Usuario::select('estado')->where('email', '=', $credentials['email'])->get()->first();
+			if ($verificarEstado['estado'] == 0) {
 				return response()->json([
 					'success'     => false,
 					'error'       => 'Esta cuenta esta Desactivada',
@@ -122,10 +122,10 @@ class AuthController extends Controller {
 	protected function respondWithToken($token) {
  
 		return response()->json([
-			// 'success' => true,
+			'success' => true,
 			'access_token' => $token,
-			// 'user'=>auth()->user()->only(['idUsuario','nombres','cargo']),
-			// 'expires_in' => auth()->factory()->getTTL() * 60,
+			'user'=>auth()->user(),
+			'expires_in' => auth()->factory()->getTTL() / 60,
 			// 'status_code'=>200
 		]);
 	}

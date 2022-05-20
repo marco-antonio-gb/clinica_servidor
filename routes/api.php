@@ -1,5 +1,8 @@
 <?php
 use Illuminate\Support\Facades\Route;
+
+
+
 Route::group([
 	'middleware' => 'api',
 	'prefix'     => 'auth',
@@ -9,6 +12,10 @@ Route::group([
 	Route::post('refresh', 'AuthController@refresh');
 	Route::post('me', 'AuthController@userProfile');
 });
+
+
+
+
 Route::group(['middleware' => ['jwt.verify','cors']], function () {
 	Route::Apiresource('usuarios', UsuarioController::class, ['except' => ['create', 'edit']]);
 	Route::get('user', 'UsuarioController@getAuthenticatedUser');
@@ -19,7 +26,31 @@ Route::group(['middleware' => ['jwt.verify','cors']], function () {
 	Route::post('reset-password', 'UsuarioController@ResetPassword');
 	# Verifica si existe un email, antes de crear un usuario
     Route::post('verify-email', 'UsuarioController@verifyEmailExist');
+
 });
+#PERSONAS
+Route::apiResource('personas',PersonaController::class);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Route::get('/clear-cache', function () {
 	Artisan::call('cache:clear');
 	return "Cache is cleared";
