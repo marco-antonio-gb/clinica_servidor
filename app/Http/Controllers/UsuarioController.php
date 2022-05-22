@@ -1,18 +1,15 @@
 <?php
-/*
- * Copyright (c) 2021.  modem.ff@gmail.com | Marco Antonio Gutierrez Beltran
- */
+
 namespace App\Http\Controllers;
 use App\Models\Usuario;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
-use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
+use Spatie\Permission\Models\Role;
 // use Spatie\Permission\Models\Permission;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Validator;
+
 class UsuarioController extends Controller {
 	public function __construct() {
 		$this->middleware('jwt.auth');
@@ -21,17 +18,17 @@ class UsuarioController extends Controller {
 		// $usuarios = Usuario::with('roles')->get();
 		// return $usuarios;
 		try {
-			$result = Usuario::select('idUsuario',DB::raw("CONCAT(IFNULL(nombres,''),' ',IFNULL(paterno,''),' ',IFNULL(materno,'')) AS full_name"), 'celular', 'cargo', 'email', 'foto', 'activo')->with('roles')->get();
+			$result = Usuario::with('roles')->with('persona')->get();
 			if (!$result->isEmpty()) {
 				return response()->json([
-					'success'     => true,	 
-					'data'        => $result
-                ],200);
+					'success' => true,
+					'data'    => $result,
+				], 200);
 			} else {
 				return response()->json([
-					'success'     => false,
-					'message'     => 'No existen resultados',
-                ], 204);
+					'success' => false,
+					'message' => 'No existen resultados',
+				], 204);
 			}
 		} catch (\Exception $ex) {
 			return response()->json([
@@ -44,8 +41,8 @@ class UsuarioController extends Controller {
 		try {
 			$validator = Validator::make($request->all(), [
 				'nombres' => 'required|string|between:2,100',
-				'ci' => 'required|between:2,15',
-				'ci_ext' => 'required|between:2,15',
+				'ci'      => 'required|between:2,15',
+				'ci_ext'  => 'required|between:2,15',
 				'celular' => 'required|string|max:9',
 				'cargo'   => 'required|string|max:100',
 				'email'   => 'required|string|email|max:100|unique:usuarios',
@@ -58,20 +55,20 @@ class UsuarioController extends Controller {
 				]);
 			}
 			$user = [
-                    "paterno" => $request['paterno'],
-                    "materno" => $request['materno'],
-                    "nombres" => $request['nombres'],
-                    "ci" => $request['ci'],
-                    "ci_ext" => $request['ci_ext'],
-                    "direccion" => $request['direccion'],
-                    "telefono" => $request['telefono'],
-                    "celular" => $request['celular'],
-                    "cargo" => $request['cargo'],
-                    "email" => $request['email'],
-                    'password' => bcrypt($request->password),
-                    "settings" => json_encode($request['settings']),
-            ];
-            $user=Usuario::create($user);
+				"paterno"   => $request['paterno'],
+				"materno"   => $request['materno'],
+				"nombres"   => $request['nombres'],
+				"ci"        => $request['ci'],
+				"ci_ext"    => $request['ci_ext'],
+				"direccion" => $request['direccion'],
+				"telefono"  => $request['telefono'],
+				"celular"   => $request['celular'],
+				"cargo"     => $request['cargo'],
+				"email"     => $request['email'],
+				'password'  => bcrypt($request->password),
+				"settings"  => json_encode($request['settings']),
+			];
+			$user = Usuario::create($user);
 			$user->assignRole($request['roles']);
 			return response()->json([
 				'success'     => true,
@@ -88,10 +85,9 @@ class UsuarioController extends Controller {
 	public function show($id) {
 		try {
 //            $roles = Usuario::join('roles','roles.idRol')
-			$usuario = Usuario::where('idUsuario', '=', $id)->get()->first();
-			$usuario->hasAllRoles(Role::all());
-			$usuario->getAllPermissions();
-			// $roles = $usuario->getRoleNames();
+			$usuario = Usuario::where('idUsuario', '=', $id)->with('persona')->with('permissions')->first();
+			$usuario->setAttribute('roles', getAllRoles($id));
+			$usuario->setAttribute('permisos', getAllPermissions($id));
 			if ($usuario) {
 				return [
 					'success'     => true,
@@ -113,7 +109,7 @@ class UsuarioController extends Controller {
 		}
 	}
 	public function update(Request $request, $id) {
-         
+
 		try {
 			$validator = Validator::make($request->all(), [
 				'paterno' => 'required|string|between:2,100',
@@ -250,12 +246,12 @@ class UsuarioController extends Controller {
 	}
 	public function ResetPassword(Request $request) {
 		try {
-            $hashed_random_password =  $this->randomPassword();
-            Usuario::where('idUsuario','=',$request['userId'])->update(['password'=> Hash::make($hashed_random_password)]);
+			$hashed_random_password = generateStrongPassword(15, false, 'luds');
+			Usuario::where('idUsuario', '=', $request['userId'])->update(['password' => Hash::make($hashed_random_password)]);
 			return response()->json([
-				'success' => true,
-				'message' => "La contraseña se restablecio",
-                'newPassword' =>$hashed_random_password
+				'success'     => true,
+				'message'     => "La contraseña se restablecio",
+				'newPassword' => $hashed_random_password,
 			], 201);
 		} catch (\Exception $ex) {
 			return response()->json([
@@ -266,14 +262,14 @@ class UsuarioController extends Controller {
 	}
 	public function BloquearUsuario(Request $request) {
 		try {
-            if($request['status']===0){
-                $active=true;
-                $mensaje="Cuenta de usuario activada correctamente";
-            }else{
-                $active=false;
-                $mensaje="Cuenta de usuario suspendida";
-            }
-            Usuario::where('idUsuario','=',$request['userId'])->update(['activo'=> $active]);
+			if ($request['status']) {
+				$active  = false;
+				$mensaje = "Cuenta de usuario desactivada";
+			} else {
+				$active  = true;
+				$mensaje = "Cuenta de usuario activada correctamente";
+			}
+			Usuario::where('idUsuario', '=', $request['userId'])->update(['activo' => $active]);
 			return response()->json([
 				'success' => true,
 				'message' => $mensaje,
@@ -285,24 +281,39 @@ class UsuarioController extends Controller {
 			], 404);
 		}
 	}
-    public function randomPassword() {
-        $alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890';
-        $pass = array(); //remember to declare $pass as an array
-        $count=0;
-        $alphaLength = strlen($alphabet) - 1; //put the length -1 in cache
-        for ($i = 0; $i < 12; $i++) {
-            if($count===4){
-                $pass[]="-";
-                $count=0;
-            }
-            $n = rand(0, $alphaLength);
-            $pass[] = $alphabet[$n];
-            $count++;
-        }
-        return implode($pass); //turn the array into a string
-    }
-    public function SetTheme(Request $request){
-        $id = auth()->user()->idUsuario;
-        Usuario::where('idUsuario','=',$id)->update(['settings'=>$request->all()]);
-    }
+	public function randomPassword() {
+		$alphabet    = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890';
+		$pass        = array(); //remember to declare $pass as an array
+		$count       = 0;
+		$alphaLength = strlen($alphabet) - 1; //put the length -1 in cache
+		for ($i = 0; $i < 12; $i++) {
+			if ($count === 4) {
+				$pass[] = "-";
+				$count  = 0;
+			}
+			$n      = rand(0, $alphaLength);
+			$pass[] = $alphabet[$n];
+			$count++;
+		}
+		return implode($pass); //turn the array into a string
+	}
+	public function SetTheme(Request $request) {
+		try {
+			$id                              = auth()->user()->idUsuario;
+			$usuario                         = Usuario::select('settings')->where('idUsuario', '=', $id)->first();
+			$theme                           = json_decode(json_encode($usuario), true);
+			$theme['settings']['dark_theme'] = $request['dark_theme'];
+			Usuario::where('idUsuario', '=', $id)->update(['settings' => json_encode($theme['settings'])]);
+			return response()->json([
+				'success' => true,
+				'message' => "Color de tema actualizado",
+			], 201);
+		} catch (\Exception $ex) {
+			return response()->json([
+				'success' => false,
+				'error'   => $ex->getMessage(),
+			], 404);
+		}
+	}
+
 }

@@ -24,6 +24,7 @@ class CreateUsuariosTable extends Migration
             $table->string('profesion')->nullable();
             $table->string('referencia')->nullable();
             $table->boolean('estado')->nullable()->default(false);
+            $table->json('settings');
             $table->unsignedBigInteger('persona_id');
             $table->foreign('persona_id')->references('idPersona')->on('personas')->onDelete('cascade');
             $table->timestamps();

@@ -23,4 +23,6 @@ class persona extends Model
         'correo',
         'fec_nac'
     ];
+ 
+    
 }

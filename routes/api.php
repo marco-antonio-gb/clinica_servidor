@@ -1,8 +1,5 @@
 <?php
 use Illuminate\Support\Facades\Route;
-
-
-
 Route::group([
 	'middleware' => 'api',
 	'prefix'     => 'auth',
@@ -12,45 +9,28 @@ Route::group([
 	Route::post('refresh', 'AuthController@refresh');
 	Route::post('me', 'AuthController@userProfile');
 });
-
-
-
-
 Route::group(['middleware' => ['jwt.verify','cors']], function () {
-	Route::Apiresource('usuarios', UsuarioController::class, ['except' => ['create', 'edit']]);
-	Route::get('user', 'UsuarioController@getAuthenticatedUser');
-	Route::Apiresource('roles', RolController::class, ['except' => ['create', 'edit']]);
-	Route::Apiresource('permisos', PermisoController::class, ['except' => ['create', 'edit']]);
-	Route::post('update-password', 'UsuarioController@updatePassUsuario');
+    #Personas
+    Route::apiResource('personas',PersonaController::class)->middleware(['role:Administrador']);
+    Route::post('verificar-ci', 'PersonaController@VerificarCi');
+
+    #Usuarios
+	Route::apiResource('usuarios', UsuarioController::class);
+    Route::post('update-password', 'UsuarioController@updatePassUsuario');
 	Route::post('suspend-account', 'UsuarioController@BloquearUsuario');
 	Route::post('reset-password', 'UsuarioController@ResetPassword');
-	# Verifica si existe un email, antes de crear un usuario
+	Route::get('get-active-users/{idUsuario}', 'UsuarioController@getActiveUsers');
+	Route::post('set-theme', 'UsuarioController@SetTheme');
+    Route::post('update-password', 'UsuarioController@updatePassUsuario');
+	Route::post('suspend-account', 'UsuarioController@BloquearUsuario');
+	Route::post('reset-password', 'UsuarioController@ResetPassword');
     Route::post('verify-email', 'UsuarioController@verifyEmailExist');
-
+    #Roles
+    Route::apiResource('roles', RolController::class)->middleware(['role:Administrador']);
+	#Permisos
+    Route::apiResource('permisos', PermisoController::class)->middleware(['role:Administrador']);
+    // Route::get('user', 'UsuarioController@getAuthenticatedUser');
 });
-#PERSONAS
-Route::apiResource('personas',PersonaController::class);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 Route::get('/clear-cache', function () {
 	Artisan::call('cache:clear');
 	return "Cache is cleared";

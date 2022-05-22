@@ -31,10 +31,13 @@ class Handler extends ExceptionHandler
      *
      * @return void
      */
-    public function register()
-    {
-        $this->reportable(function (Throwable $e) {
-            //
-        });
-    }
+    public function register() {
+		$this->renderable(function (\Spatie\Permission\Exceptions\UnauthorizedException $e, $request) {
+			return response()->json([
+                'success'  => false,
+				'message' => 'No posee los permisos necesarios para ver el contenido',
+			],403);
+		});
+	 
+	}
 }

@@ -26,5 +26,19 @@ class PersonaSeeder extends Seeder {
             "genero" => "Femenino",
 
 		]);
+		Persona::create([
+			"paterno"=> "Gutierrez",
+            "materno"=> "Beltran",
+            "nombres"=> "Marco Antonio",
+            "ci"=> "5779557",
+            "ci_ext"=> "OR",
+            "fec_nac"=> "1990-02-14",
+            "celular"=> "71856386",
+            "correo"=> "modem.ff@gmail.com",
+            "direccion"=> "Direccion",
+            "estado_civil" =>"Soltero",
+            "genero" => "Masculino",
+
+		]);
 	}
 }

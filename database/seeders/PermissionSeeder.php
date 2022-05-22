@@ -26,6 +26,11 @@ class PermissionSeeder extends Seeder {
 			'rol-update',
 			'rol-delete',
 			#--------------
+			'permiso-list',
+			'permiso-create',
+			'permiso-update',
+			'permiso-delete',
+			#--------------
 			'asignar-rol',
 			'asignar-permiso',
 			#--------------

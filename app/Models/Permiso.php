@@ -14,7 +14,7 @@ class Permiso extends Model
         'descripcion',
 
     ];
-    protected $hidden = ['pivot','id','guard_name','descripcion'];
+    protected $hidden = ['pivot','id','guard_name'];
  
     public function roles(){
         return $this->belongsToMany(Rol::class,'role_has_permissions','permission_id','role_id');

@@ -1,7 +1,5 @@
 <?php
-/*
- * Copyright (c) 2021.  modem.ff@gmail.com | Marco Antonio Gutierrez Beltran
- */
+ 
 namespace App\Http\Controllers;
 use App\Models\Rol;
 use Illuminate\Http\Request;
